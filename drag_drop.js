@@ -1,5 +1,5 @@
 ////========================VARIABLE DECLERATIONS========================
-let canvas = document.getElementById('circuitBoard');
+let canvas = document.getElementById('circuitCanvas');
 let context = canvas.getContext('2d');
 
 let canvas_width;
