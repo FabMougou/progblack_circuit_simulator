@@ -4,6 +4,7 @@ let types = {
     and: 'AND',
     or: 'OR',
     not: 'NOT',
+    xor: 'XOR',
 }
 
 let operations = {
@@ -12,6 +13,7 @@ let operations = {
     AND: '(a & b)',
     OR: '(a | b)',
     NOT: '(!a)',
+    XOR: '(a ^ b)',
 }
 
 
@@ -28,6 +30,7 @@ class Node{
         this.height = (Math.max(this.input, this.output) * 15) + 50;
         this.width = (this.type.length * 10) + 75; //Width is the length of the type string times 10 (so it fits name in it)
 
+        this.inputNodes = new Array(input).fill(null);
         this.outputNodes = new Array(output).fill(null);
         this.inputValues = new Array(input).fill(0);
 
@@ -36,7 +39,6 @@ class Node{
 
     }
     move(x, y){
-        console.log("ran too")
         this.x = x;
         this.y = y;
     }
@@ -116,6 +118,17 @@ class OR extends Node{
     constructor(x, y) {
         super(types.or, 2, 1, x, y);
     }
+    operate(){
+        let a = this.inputValues[0], b = this.inputValues[1];
+        propagateOutput(this.outputNodes[0], eval(operations[this.type]))
+    }
+}
+
+class XOR extends Node{
+    constructor(x, y){
+        super(types.xor, 2, 1, x, y);
+    }
+
     operate(){
         let a = this.inputValues[0], b = this.inputValues[1];
         propagateOutput(this.outputNodes[0], eval(operations[this.type]))
