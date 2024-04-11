@@ -97,7 +97,7 @@ class BULB extends Node{
         this.state = false;
     }
     operate(){
-        this.state = Boolean(this.inputVal[0])
+        this.state = Boolean(this.inputValues[0])
     }
     show(){
         super.show(this.state? '#922' : '#333');
@@ -151,5 +151,5 @@ function evenlySpreadPoints(x, y1, y2, n){
 
 function propagateOutput(outputNode, value){
     if (!outputNode) return;
-    outputNode.setInput(value, outputNode.index);
+    outputNode.node.setInput(value, outputNode.index);
 }

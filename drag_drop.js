@@ -21,21 +21,26 @@ let is_dragging = false;
 
 //===========================P5.JS==============================
 function setup() {
-    createCanvas(window.innerWidth, window.innerHeight);
-    background(200);
+    console.log(windowWidth, windowHeight)
+    createCanvas(windowWidth, windowHeight);
+    background(500);
 
     bg = createBG();
     image(bg, 0, 0);
 
-    addNode(new AND(2, 1));
-    addNode(new AND(2, 1));
-    addNode(new AND(2, 1));
-    addNode(new AND(2, 1));
-    addNode(new OR(2, 1));
+    addNode(new AND());
+    addNode(new AND());
+    addNode(new AND());
+    addNode(new AND());
+    addNode(new OR());
+    addNode(new BULB());
+    addNode(new SWITCH());
 
     for (let node of nodes) {
         node.show();
     }
+
+
 
 }
 
@@ -64,7 +69,7 @@ function mousePressed() {
     if (!nearest) return;
 
     if (is_mouse_in_shape(nearest.x, nearest.y, nearest.width, nearest.height)) {
-        console.log("IN")
+        nearest.onclick?.(); 
         moving = nearest;
         offset = {x: nearest.x - mouseX,
                   y: nearest.y - mouseY};
@@ -74,7 +79,6 @@ function mousePressed() {
     for (let i = 0; i < nearest.inputPositions.length; i++) {
         let inputBox = nearest.inputPositions[i];
         if (is_mouse_in_shape(nearest.x + inputBox.x, nearest.y + inputBox.y, 20, 20)) {
-            console.log("Input")
             lining = { 
                 node: nearest,
                 index: i, 
@@ -89,7 +93,6 @@ function mousePressed() {
     for (let i = 0; i < nearest.outputPositions.length; i++) {
         let outputBox = nearest.outputPositions[i];
         if (is_mouse_in_shape(nearest.x + outputBox.x, nearest.y + outputBox.y, 12, 12)) {
-            console.log("output!")
             if (nearest.outputNodes[i] == null) {
                 lining = { 
                     node: nearest,
@@ -108,7 +111,6 @@ let line_end;
 function mouseDragged() {
     image(bg, 0, 0);
     line_end = {x: mouseX, y: mouseY};
-    console.log("ram!")
 
     if (moving){
         if (rack.includes(moving)){
@@ -117,7 +119,6 @@ function mouseDragged() {
         moving.move(mouseX + offset.x, mouseY + offset.y);
 
     } else if (lining) {
-        console.log("ran!!!")
         line(lining.x, lining.y, line_end.x, line_end.y);
     }
 }
@@ -141,6 +142,9 @@ function mouseReleased() {
             }
         }
     }
+    lining = null;
+    image(bg, 0, 0);
+    
 }
 
 function is_mouse_in_shape(shapeX, shapeY, shapeHeight, shapeWidth){
@@ -158,14 +162,14 @@ function is_mouse_in_shape(shapeX, shapeY, shapeHeight, shapeWidth){
 }
 
 function addNode(node){
-    let x = 50, y = 100;
+    let x = 100, y = 100;
 
     if (rack.length > 0){
         x = (rack[rack.length-1].x) + (rack[rack.length-1].width / 2) + 75;
 
         if (rack.length == 5){
-            x = 50;
-            y += 50;
+            x = 100;
+            y += 100;
         }
     }
 
@@ -178,16 +182,28 @@ function addNode(node){
 
 
 function createBG(){
-    let bg = createGraphics(width, height);
-    let size = 50;
+    console.log("YAYAAA")
+    let bg = createGraphics(3000, 3000);
     bg.background('#fff')
     bg.stroke('#888')
-    for (let j = 0; j < height; j += size) bg.line(0, j, width, j);
-    for (let i = 0; i < width; i += size) bg.line(i, 0, i, height);
+    size = 50;
+    for (let j = 0; j < 3000; j += size) bg.line(0, j, 3000, j);
+    for (let i = 0; i < 3000; i += size) bg.line(i, 0, i, 3000);
+
   
     return bg;
 }
 
+function windowResized(){
+    
+    console.log("test")
+    console.log(windowWidth, windowHeight)
+    resizeCanvas(windowWidth, windowHeight);
+    image(bg, 0, 0);
+
+}
+
+window.addEventListener('resize', windowResized);
 
 
 
