@@ -1,20 +1,199 @@
 ////========================VARIABLE DECLERATIONS========================
-let canvas = document.getElementById('circuitCanvas');
-let context = canvas.getContext('2d');
+//let canvas = document.getElementById('circuitCanvas');
+//let context = canvas.getContext('2d');
 
 let canvas_width;
 let canvas_height;
 let padding_x;
 let padding_y;
-let shapes = [];
+
+let offset = {x: 0, y: 0};
+let lining;
+let moving;
+let rack = [];
+let nodes = [];
+let bg;
+
+
 let current_shape_index = null;
 let is_dragging = false;
 
 
-//Test shapes
-shapes.push( {x: 1000, y: 300, width: 350, height: 350, color: 'yellow'} );
-shapes.push( {x: 110, y: 50, width: 100, height: 100, color: 'red'} );
-shapes.push( {x: 0, y: 0, width: 50, height: 100, color: 'blue'} );
+//===========================P5.JS==============================
+function setup() {
+    createCanvas(window.innerWidth, window.innerHeight);
+    background(200);
+
+    bg = createBG();
+    image(bg, 0, 0);
+
+    addNode(new AND(2, 1));
+    addNode(new AND(2, 1));
+    addNode(new AND(2, 1));
+    addNode(new AND(2, 1));
+    addNode(new OR(2, 1));
+
+    for (let node of nodes) {
+        node.show();
+    }
+
+}
+
+function draw() {
+    set_nearest();
+
+}
+
+function set_nearest() {
+    let minDistance = 10000000;
+    for (let node of nodes) {
+        let distance = dist(mouseX, mouseY, node.x, node.y);
+
+        if (distance < minDistance) {
+            minDistance = distance;
+            nearest = node;
+        }
+        node.show();
+        node.operate();
+    }
+}
+
+function mousePressed() {
+    set_nearest();
+    console.log(nearest)
+    if (!nearest) return;
+
+    if (is_mouse_in_shape(nearest.x, nearest.y, nearest.width, nearest.height)) {
+        console.log("IN")
+        moving = nearest;
+        offset = {x: nearest.x - mouseX,
+                  y: nearest.y - mouseY};
+
+    }
+
+    for (let i = 0; i < nearest.inputPositions.length; i++) {
+        let inputBox = nearest.inputPositions[i];
+        if (is_mouse_in_shape(nearest.x + inputBox.x, nearest.y + inputBox.y, 20, 20)) {
+            console.log("Input")
+            lining = { 
+                node: nearest,
+                index: i, 
+                type: 'input', 
+                x: nearest.x + inputBox.x, 
+                y: nearest.y + inputBox.y };
+
+            moving = null;
+        }
+    }
+
+    for (let i = 0; i < nearest.outputPositions.length; i++) {
+        let outputBox = nearest.outputPositions[i];
+        if (is_mouse_in_shape(nearest.x + outputBox.x, nearest.y + outputBox.y, 12, 12)) {
+            console.log("output!")
+            if (nearest.outputNodes[i] == null) {
+                lining = { 
+                    node: nearest,
+                    index: i, 
+                    type: 'output', 
+                    x: nearest.x + outputBox.x, 
+                    y: nearest.y + outputBox.y };
+
+                moving = null;
+            }
+        }
+    }
+}
+
+let line_end;
+function mouseDragged() {
+    image(bg, 0, 0);
+    line_end = {x: mouseX, y: mouseY};
+    console.log("ram!")
+
+    if (moving){
+        if (rack.includes(moving)){
+         rack.splice(rack.indexOf(moving), 1)
+        }
+        moving.move(mouseX + offset.x, mouseY + offset.y);
+
+    } else if (lining) {
+        console.log("ran!!!")
+        line(lining.x, lining.y, line_end.x, line_end.y);
+    }
+}
+
+function mouseReleased() {
+    moving = null;
+    if (lining?.type == 'output') {
+        for (let i = 0; i < nearest.inputPositions.length; i++) {
+            let inputBox = nearest.inputPositions[i];
+            if (is_mouse_in_shape(nearest.x + inputBox.x, nearest.y + inputBox.y, 12, 12)) {
+                lining.node.outputNodes[lining.index] = {node: nearest, index: i};
+            }
+        }
+    }
+
+    else if (lining?.type == 'input') {
+        for (let i = 0; i < nearest.outputPositions.length; i++) {
+            let outputBox = nearest.outputPositions[i];
+            if (is_mouse_in_shape(nearest.x + outputBox.x, nearest.y + outputBox.y, 12, 12)) {
+                nearest.outputNodes[i] = {node: lining.node, index: lining.index};
+            }
+        }
+    }
+}
+
+function is_mouse_in_shape(shapeX, shapeY, shapeHeight, shapeWidth){
+
+    if (mouseX < shapeX - shapeWidth/2 || //Left
+        mouseX > shapeX + shapeWidth/2 || //Right
+        mouseY < shapeY - shapeHeight/2 || //Top
+        mouseY > shapeY + shapeHeight/2){ //Bottom
+
+        return false
+    } 
+    else {
+        return true
+    }
+}
+
+function addNode(node){
+    let x = 50, y = 100;
+
+    if (rack.length > 0){
+        x = (rack[rack.length-1].x) + (rack[rack.length-1].width / 2) + 75;
+
+        if (rack.length == 5){
+            x = 50;
+            y += 50;
+        }
+    }
+
+    node.x = x;
+    node.y = y;
+
+    rack.push(node);
+    nodes.push(node);
+}
+
+
+function createBG(){
+    let bg = createGraphics(width, height);
+    let size = 50;
+    bg.background('#fff')
+    bg.stroke('#888')
+    for (let j = 0; j < height; j += size) bg.line(0, j, width, j);
+    for (let i = 0; i < width; i += size) bg.line(i, 0, i, height);
+  
+    return bg;
+}
+
+
+
+
+
+
+
 
 //========================CANVAS FUNCTIONS========================
 //Function to make the canvas responsive to the window size
@@ -49,6 +228,7 @@ function draw_shapes(){
 //Function to keep the shapes within the canvas boundaries
 //x=0, left side of the screen
 //y=0, top of the screen
+
 function check_boundary(shape){
     //Left boundary
     if (shape.x < 0){ 
@@ -71,18 +251,7 @@ function check_boundary(shape){
 //========================MOUSE FUNCTIONS========================
 
 //Checks if the mouse is over the shape passed into the function
-function is_mouse_in_shape(x, y, shape){
-    let shape_left = shape.x;
-    let shape_right = shape.x + shape.width;
-    let shape_top = shape.y;
-    let shape_bottom = shape.y + shape.height;
 
-    //if the mouse is within all of the boundaries of the shape, return true
-    if (x >= shape_left && x <= shape_right && y >= shape_top && y <= shape_bottom){
-        return true;
-    }
-    return false;
-}
 
 //When the mouse is clicked, check if it is over a shape and if so, set the shape to be dragged
 function mouse_down(event){
@@ -144,19 +313,21 @@ function mouse_move(event){
     draw_shapes();
 }
 
-//========================EVENT LISTENERS========================
-//Listeners for mouse actions on the canvas
-canvas.onmousedown = mouse_down; 
-canvas.onmouseup = mouse_up;
-canvas.onmouseout = mouse_out;
-canvas.onmousemove = mouse_move;
 
-//Listeners for window resize to alter canvas boundaries and padding
-window.addEventListener('resize', responsive_canvas);
-window.addEventListener('resize', get_padding);
-window.addEventListener('scroll', get_padding);
-canvas.addEventListener('resize', get_padding);
 
-//========================INITIAL CALL FUNCTIONS========================
-responsive_canvas();
-get_padding();
+// //========================EVENT LISTENERS========================
+// //Listeners for mouse actions on the canvas
+// canvas.onmousedown = mouse_down; 
+// canvas.onmouseup = mouse_up;
+// canvas.onmouseout = mouse_out;
+// canvas.onmousemove = mouse_move;
+
+// //Listeners for window resize to alter canvas boundaries and padding
+// window.addEventListener('resize', responsive_canvas);
+// window.addEventListener('resize', get_padding);
+// window.addEventListener('scroll', get_padding);
+// canvas.addEventListener('resize', get_padding);
+
+// //========================INITIAL CALL FUNCTIONS========================
+// responsive_canvas();
+// get_padding();
