@@ -1,7 +1,4 @@
 ////========================VARIABLE DECLERATIONS========================
-//let canvas = document.getElementById('circuitCanvas');
-//let context = canvas.getContext('2d');
-
 let canvas_width;
 let canvas_height;
 let padding_x;
@@ -21,7 +18,6 @@ let current_shape_index = null;
 let is_dragging = false;
 
 
-//===========================P5.JS==============================
 function setup() {
     createCanvas(windowWidth, windowHeight);
     background(500);
@@ -109,7 +105,9 @@ function mousePressed() {
     //For each output box
     for (let i = 0; i < nearest.outputPositions.length; i++) {
         let outputBox = nearest.outputPositions[i];
+        //Checks if connection box is clicked
         if (is_mouse_in_shape(nearest.x + outputBox.x, nearest.y + outputBox.y, 12, 12)) {
+            //If there is no connection yet, starts drawing line
             if (nearest.outputNodes[i] == null) {
                 lining = { 
                     node: nearest,
@@ -141,12 +139,14 @@ function mouseReleased() {
     console.log(nearest, nearest.inputNodes)
     moving = null;
 
+    //If line is coming from an output connection box
     if (lining?.type == 'output') {
-
         for (let i = 0; i < nearest.inputPositions.length; i++) {
+            //Checks if input box already has another connection
             if (nearest.inputNodes[i] != null) continue;
             let inputBox = nearest.inputPositions[i];
 
+            //If mouse is in input box, connects the two nodes
             if (is_mouse_in_shape(nearest.x + inputBox.x, nearest.y + inputBox.y, 12, 12)) {
 
                 if (lining.node.type == types.junction) {
@@ -165,10 +165,12 @@ function mouseReleased() {
             }
         }
     }
-
+    //If line is coming from an input connection box
     else if (lining?.type == 'input') {
-
+        
         for (let i = 0; i < nearest.outputPositions.length; i++) {
+
+            if (nearest.outputNodes[i] != null) continue;
             let outputBox = nearest.outputPositions[i];
 
             if (is_mouse_in_shape(nearest.x + outputBox.x, nearest.y + outputBox.y, 12, 12)) {
