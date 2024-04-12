@@ -40,6 +40,7 @@ function setup() {
     addNode(new SWITCH());
     addNode(new XOR());
     addNode(new JUNCTION());
+    addNode(new JUNCTION());
 
     for (let node of nodes) {
         node.show();
@@ -78,6 +79,7 @@ function mousePressed() {
         offset = {x: nearest.x - mouseX,
                   y: nearest.y - mouseY};
 
+
     }
 
     //For each input box
@@ -91,11 +93,9 @@ function mousePressed() {
                     type: 'input', 
                     x: nearest.x + inputBox.x, 
                     y: nearest.y + inputBox.y };
-
                 moving = null;
             } else {
                 //Disconnects line on click if there already is one
-                nearest.inputNodes[i].node.outputNodes
                 outputIndex = nearest.inputNodes[i].index;
 
                 nearest.inputNodes[i].node.outputNodes[outputIndex] = null;
@@ -119,16 +119,77 @@ function mousePressed() {
                     y: nearest.y + outputBox.y };
 
                 moving = null;
+
             } else {
                 //Disconnects line on click if there already is one
-                inputIndex = nearest.outputNodes[i].index;
-                
-                nearest.outputNodes[i].node.inputValues[inputIndex] = 0;
-                nearest.outputNodes[i] = null;
+                if (nearest.type != types.junction){
+                    inputIndex = nearest.outputNodes[i].index;
+                    
+                    nearest.outputNodes[i].node.inputValues[inputIndex] = 0;
+                    nearest.outputNodes[i].node.inputNodes[i] = null;
+                    nearest.outputNodes[i] = null;
+
+
+                }
+            }
+        }
+    }
+}
+
+function mouseReleased() {
+    set_nearest();
+    console.log(nearest, nearest.inputNodes)
+    moving = null;
+
+    if (lining?.type == 'output') {
+
+        for (let i = 0; i < nearest.inputPositions.length; i++) {
+            if (nearest.inputNodes[i] != null) continue;
+            let inputBox = nearest.inputPositions[i];
+
+            if (is_mouse_in_shape(nearest.x + inputBox.x, nearest.y + inputBox.y, 12, 12)) {
+
+                if (lining.node.type == types.junction) {
+
+                    lining.node.outputPositions.push(lining.node.outputPositions[0]);
+                    lining.node.outputNodes.push({ node: nearest, index: i });
+                    nearest.inputNodes[i] = {node: lining.node, index: lining.index};
+                }
+
+                else{
+                    lining.node.outputNodes[lining.index] = {node: nearest, index: i};
+                    nearest.inputNodes[i] = {node: lining.node, index: lining.index};
+                }
+
 
             }
         }
     }
+
+    else if (lining?.type == 'input') {
+
+        for (let i = 0; i < nearest.outputPositions.length; i++) {
+            let outputBox = nearest.outputPositions[i];
+
+            if (is_mouse_in_shape(nearest.x + outputBox.x, nearest.y + outputBox.y, 12, 12)) {
+
+                if (nearest.type == types.junction) {
+                    nearest.outputPositions.push(nearest.outputPositions[0]);
+                    nearest.outputNodes.push({ node: lining.node, index: lining.index });
+                    lining.node.inputNodes[lining.index] = {node: nearest, index: i};
+                    break
+
+                } else {    
+                    nearest.outputNodes[i] = {node: lining.node, index: lining.index};
+                }
+
+                lining.node.inputNodes[lining.index] = {node: nearest, index: i};
+            }
+        }
+    }
+    lining = null;
+    image(bg, 0, 0);
+    
 }
 
 let line_end;
@@ -145,43 +206,6 @@ function mouseDragged() {
     } else if (lining) {
         line(lining.x, lining.y, line_end.x, line_end.y);
     }
-}
-
-function mouseReleased() {
-    set_nearest();
-    moving = null;
-    if (lining?.type == 'output') {
-        for (let i = 0; i < nearest.inputPositions.length; i++) {
-            let inputBox = nearest.inputPositions[i];
-            if (is_mouse_in_shape(nearest.x + inputBox.x, nearest.y + inputBox.y, 12, 12)) {
-
-                if (lining.node.type == types.junction) {
-                    lining.node.outputNodes.push({ node: nearest, index: i })
-
-                } else {
-                lining.node.outputNodes[lining.index] = {node: nearest, index: i};
-                }
-
-                nearest.inputNodes[i] = {node: lining.node, index: lining.index};
-            }
-        }
-    }
-
-    else if (lining?.type == 'input') {
-        for (let i = 0; i < nearest.outputPositions.length; i++) {
-            let outputBox = nearest.outputPositions[i];
-            if (is_mouse_in_shape(nearest.x + outputBox.x, nearest.y + outputBox.y, 12, 12)) {
-                if (nearest.type == types.junction) {
-                    nearest.outputNodes.push({ node: lining.node, index: lining.index })
-                } else {    
-                    nearest.outputNodes[i] = {node: lining.node, index: lining.index};
-                }
-            }
-        }
-    }
-    lining = null;
-    image(bg, 0, 0);
-    
 }
 
 function is_mouse_in_shape(shapeX, shapeY, shapeWidth, shapeHeight){
