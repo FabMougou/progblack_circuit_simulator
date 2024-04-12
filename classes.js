@@ -5,6 +5,7 @@ let types = {
     or: 'OR',
     not: 'NOT',
     xor: 'XOR',
+    junction: 'JUNCTION',
 }
 
 let operations = {
@@ -14,6 +15,7 @@ let operations = {
     OR: '(a | b)',
     NOT: '(!a)',
     XOR: '(a ^ b)',
+    JUNCTION: 'a',
 }
 
 
@@ -69,8 +71,8 @@ class Node{
         if(this.outputNodes){
             for (let i = 0; i < this.outputNodes.length; i++) {
                 let out = this.outputNodes[i];
-                if(!out) continue;
-                line(this.x+this.outputPositions[i].x, this.y+this.outputPositions[i].y, out.node.x+out.node.inputPositions[out.index].x, out.node.y+out.node.inputPositions[out.index].y);
+                if(!out || !out.node) continue;
+                line(this.x+this.outputPositions[0].x, this.y+this.outputPositions[0].y, out.node.x+out.node.inputPositions[out.index].x, out.node.y+out.node.inputPositions[out.index].y);
             }
         }
 
@@ -142,6 +144,20 @@ class NOT extends Node{
     operate(){
         let a = this.inputValues[0];
         propagateOutput(this.outputNodes[0], eval(operations[this.type]))
+    }
+}
+
+class JUNCTION extends Node{
+    constructor(x, y){
+        super(types.junction, 1, 1, x, y)
+        this.outputNodes = [];
+
+    }
+    operate(){
+        for (let node of this.outputNodes){
+            let a = this.inputValues[0];
+            propagateOutput(node, this.inputValues[0]);
+        }
     }
 }
 

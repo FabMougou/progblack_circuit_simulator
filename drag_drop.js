@@ -39,6 +39,7 @@ function setup() {
     addNode(new SWITCH());
     addNode(new SWITCH());
     addNode(new XOR());
+    addNode(new JUNCTION());
 
     for (let node of nodes) {
         node.show();
@@ -50,7 +51,6 @@ function setup() {
 
 function draw() {
     set_nearest();
-
 }
 
 function set_nearest() {
@@ -71,6 +71,7 @@ function mousePressed() {
     set_nearest();
     if (!nearest) return;
 
+    
     if (is_mouse_in_shape(nearest.x, nearest.y, nearest.width, nearest.height)) {
         nearest.onclick?.(); 
         moving = nearest;
@@ -79,6 +80,7 @@ function mousePressed() {
 
     }
 
+    //For each input box
     for (let i = 0; i < nearest.inputPositions.length; i++) {
         let inputBox = nearest.inputPositions[i];
         if (is_mouse_in_shape(nearest.x + inputBox.x, nearest.y + inputBox.y, 20, 20)) {
@@ -93,6 +95,7 @@ function mousePressed() {
                 moving = null;
             } else {
                 //Disconnects line on click if there already is one
+                nearest.inputNodes[i].node.outputNodes
                 outputIndex = nearest.inputNodes[i].index;
 
                 nearest.inputNodes[i].node.outputNodes[outputIndex] = null;
@@ -103,6 +106,7 @@ function mousePressed() {
         }
     }
 
+    //For each output box
     for (let i = 0; i < nearest.outputPositions.length; i++) {
         let outputBox = nearest.outputPositions[i];
         if (is_mouse_in_shape(nearest.x + outputBox.x, nearest.y + outputBox.y, 12, 12)) {
@@ -118,6 +122,7 @@ function mousePressed() {
             } else {
                 //Disconnects line on click if there already is one
                 inputIndex = nearest.outputNodes[i].index;
+                
                 nearest.outputNodes[i].node.inputValues[inputIndex] = 0;
                 nearest.outputNodes[i] = null;
 
@@ -149,7 +154,14 @@ function mouseReleased() {
         for (let i = 0; i < nearest.inputPositions.length; i++) {
             let inputBox = nearest.inputPositions[i];
             if (is_mouse_in_shape(nearest.x + inputBox.x, nearest.y + inputBox.y, 12, 12)) {
+
+                if (lining.node.type == types.junction) {
+                    lining.node.outputNodes.push({ node: nearest, index: i })
+
+                } else {
                 lining.node.outputNodes[lining.index] = {node: nearest, index: i};
+                }
+
                 nearest.inputNodes[i] = {node: lining.node, index: lining.index};
             }
         }
@@ -159,7 +171,11 @@ function mouseReleased() {
         for (let i = 0; i < nearest.outputPositions.length; i++) {
             let outputBox = nearest.outputPositions[i];
             if (is_mouse_in_shape(nearest.x + outputBox.x, nearest.y + outputBox.y, 12, 12)) {
-                nearest.outputNodes[i] = {node: lining.node, index: lining.index};
+                if (nearest.type == types.junction) {
+                    nearest.outputNodes.push({ node: lining.node, index: lining.index })
+                } else {    
+                    nearest.outputNodes[i] = {node: lining.node, index: lining.index};
+                }
             }
         }
     }
@@ -168,13 +184,12 @@ function mouseReleased() {
     
 }
 
-function is_mouse_in_shape(shapeX, shapeY, shapeHeight, shapeWidth){
-
-    if (mouseX < shapeX - shapeWidth/2 || //Left
-        mouseX > shapeX + shapeWidth/2 || //Right
-        mouseY < shapeY - shapeHeight/2 || //Top
-        mouseY > shapeY + shapeHeight/2){ //Bottom
-
+function is_mouse_in_shape(shapeX, shapeY, shapeWidth, shapeHeight){
+    if (mouseX < shapeX - (shapeWidth/2) || //Left
+        mouseX > shapeX + (shapeWidth/2) || //Right
+        mouseY < shapeY - (shapeHeight/2) || //Top
+        mouseY > shapeY + (shapeHeight/2)){ //Bottom
+        
         return false
     } 
     else {
@@ -183,7 +198,6 @@ function is_mouse_in_shape(shapeX, shapeY, shapeHeight, shapeWidth){
 }
 
 function addNode(node){
-    console.log(rack.length)
 
     if (rack.length > 0){
         rackX = (rack[rack.length-1].x) + (rack[rack.length-1].width / 2) + 100;
