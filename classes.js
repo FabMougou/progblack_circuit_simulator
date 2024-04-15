@@ -5,7 +5,7 @@ let types = {
     or: 'OR',
     not: 'NOT',
     xor: 'XOR',
-    junction: 'JUNCTION',
+    splitter: 'SPLITTER',
 }
 
 let operations = {
@@ -15,7 +15,7 @@ let operations = {
     OR: '(a | b)',
     NOT: '(!a)',
     XOR: '(a ^ b)',
-    JUNCTION: 'a',
+    SPLITTER: 'a',
 }
 
 
@@ -147,9 +147,9 @@ class NOT extends Node{
     }
 }
 
-class JUNCTION extends Node{
+class SPLITTER extends Node{
     constructor(x, y){
-        super(types.junction, 1, 1, x, y)
+        super(types.splitter, 1, 1, x, y)
         this.outputNodes = [];
 
     }

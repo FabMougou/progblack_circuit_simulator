@@ -35,8 +35,8 @@ function setup() {
     addNode(new SWITCH());
     addNode(new SWITCH());
     addNode(new XOR());
-    addNode(new JUNCTION());
-    addNode(new JUNCTION());
+    addNode(new SPLITTER());
+    addNode(new SPLITTER());
 
     for (let node of nodes) {
         node.show();
@@ -120,7 +120,7 @@ function mousePressed() {
 
             } else {
                 //Disconnects line on click if there already is one
-                if (nearest.type != types.junction){
+                if (nearest.type != types.splitter){
                     inputIndex = nearest.outputNodes[i].index;
                     
                     nearest.outputNodes[i].node.inputValues[inputIndex] = 0;
@@ -149,7 +149,7 @@ function mouseReleased() {
             //If mouse is in input box, connects the two nodes
             if (is_mouse_in_shape(nearest.x + inputBox.x, nearest.y + inputBox.y, 12, 12)) {
 
-                if (lining.node.type == types.junction) {
+                if (lining.node.type == types.splitter) {
 
                     lining.node.outputPositions.push(lining.node.outputPositions[0]);
                     lining.node.outputNodes.push({ node: nearest, index: i });
@@ -175,7 +175,7 @@ function mouseReleased() {
 
             if (is_mouse_in_shape(nearest.x + outputBox.x, nearest.y + outputBox.y, 12, 12)) {
 
-                if (nearest.type == types.junction) {
+                if (nearest.type == types.splitter) {
                     nearest.outputPositions.push(nearest.outputPositions[0]);
                     nearest.outputNodes.push({ node: lining.node, index: lining.index });
                     lining.node.inputNodes[lining.index] = {node: nearest, index: i};
