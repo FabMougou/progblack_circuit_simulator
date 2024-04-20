@@ -11,6 +11,20 @@
 </head>
 <body>
 
+    <div id="navbar">
+        <button onclick="toggleDropdown()">Add Node</button>
+        <div id="nodeDropdown" class="dropdown-content">
+            <a href="#" onclick="addNode(new SWITCH())">Switch</a>
+            <a href="#" onclick="addNode(new BULB())">Bulb</a>
+            <a href="#" onclick="addNode(new AND())">AND Gate</a>
+            <a href="#" onclick="addNode(new OR())">OR Gate</a>
+            <a href="#" onclick="addNode(new NOT())">NOT Gate</a>
+            <a href="#" onclick="addNode(new XOR())">XOR Gate</a>
+            <a href="#" onclick="addNode(new SPLITTER())">Splitter</a>
+        </div>
+        
+    </div>
+
     <div id="circuitCanvas"></div>
     
     <script src="drag_drop.js" defer></script>

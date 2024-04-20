@@ -25,19 +25,6 @@ function setup() {
     bg = createBG();
     image(bg, 0, 0);
 
-    addNode(new AND());
-    addNode(new AND());
-    addNode(new AND());
-    addNode(new AND());
-    addNode(new OR());
-    addNode(new BULB());
-    addNode(new BULB());
-    addNode(new SWITCH());
-    addNode(new SWITCH());
-    addNode(new XOR());
-    addNode(new SPLITTER());
-    addNode(new SPLITTER());
-
     for (let node of nodes) {
         node.show();
     }
@@ -260,4 +247,6 @@ function windowResized(){
     image(bg, 0, 0);
 
 }
+
+
 
