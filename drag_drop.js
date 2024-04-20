@@ -37,6 +37,7 @@ function setup() {
     addNode(new XOR());
     addNode(new SPLITTER());
     addNode(new SPLITTER());
+    addNode(new NAND());
 
     for (let node of nodes) {
         node.show();

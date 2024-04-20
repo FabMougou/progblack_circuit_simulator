@@ -6,6 +6,7 @@ let types = {
     not: 'NOT',
     xor: 'XOR',
     splitter: 'SPLITTER',
+    nand: 'NAND',
 }
 
 let operations = {
@@ -16,6 +17,7 @@ let operations = {
     NOT: '(!a)',
     XOR: '(a ^ b)',
     SPLITTER: 'a',
+    NAND: '!(a & b)',
 }
 
 
@@ -49,7 +51,7 @@ class Node{
     }
 
     show(col){
-        fill(col ?? '#333');
+        fill(col ?? '#777');
         rectMode(CENTER);
         rect(this.x, this.y, this.width, this.height);
 
@@ -91,7 +93,7 @@ class SWITCH extends Node{
         this.state = !this.state;
     }
     show(){
-        super.show(this.state? '#922' : '#333');
+        super.show(this.state? '#B00' : '#777');
     }
 }
 
@@ -104,7 +106,7 @@ class BULB extends Node{
         this.state = Boolean(this.inputValues[0])
     }
     show(){
-        super.show(this.state? '#922' : '#333');
+        super.show(this.state? '#B00' : '#777');
     }
 }
 class AND extends Node{
@@ -158,6 +160,19 @@ class SPLITTER extends Node{
             let a = this.inputValues[0];
             propagateOutput(node, this.inputValues[0]);
         }
+    }
+}
+
+class NAND extends Node{
+    constructor(x, y){
+        super(types.nand, 2, 1, x, y)
+    }
+    operate(){
+        
+        let a = this.inputValues[0];
+        let b = this.inputValues[1];
+        propagateOutput(this.outputNodes[0], eval(operations[this.type]))
+        
     }
 }
 
