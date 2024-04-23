@@ -7,26 +7,53 @@
     <title>Circuit Simulator</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.2.0/p5.min.js"></script>
     <script src="classes.js"></script>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div id="navbar">
-        <button onclick="toggleDropdown()">Add Node</button>
-        <div id="nodeDropdown" class="dropdown-content">
-            <a href="#" onclick="addNode(new SWITCH())">Switch</a>
-            <a href="#" onclick="addNode(new BULB())">Bulb</a>
-            <a href="#" onclick="addNode(new AND())">AND Gate</a>
-            <a href="#" onclick="addNode(new OR())">OR Gate</a>
-            <a href="#" onclick="addNode(new NOT())">NOT Gate</a>
-            <a href="#" onclick="addNode(new XOR())">XOR Gate</a>
-            <a href="#" onclick="addNode(new SPLITTER())">Splitter</a>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavDropdown">
+    <ul class="navbar-nav">
+      <li class="nav-item dropdown mx-3">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Add Node
+        </a>
+        <div class="dropdown-menu my-2" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" href="#" onclick="addNode(new AND())">AND</a>
+          <a class="dropdown-item" href="#" onclick="addNode(new OR())">OR</a>
+          <a class="dropdown-item" href="#" onclick="addNode(new NOT())">NOT</a>
+          <a class="dropdown-item" href="#" onclick="addNode(new SWITCH())">SWITCH</a>
+          <a class="dropdown-item" href="#" onclick="addNode(new BULB())">BULB</a>
+          <a class="dropdown-item" href="#" onclick="addNode(new SPLITTER())">SPLITTER</a>
+          <a class="dropdown-item" href="#" onclick="addNode(new XOR())">XOR</a>
+          <a class="dropdown-item" href="#" onclick="addNode(new NAND())">NAND</a>
         </div>
-        
-    </div>
+      </li>
 
-    <div id="circuitCanvas"></div>
-    
-    <script src="drag_drop.js" defer></script>
+      <li class="nav-item dropdown mx-3">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Change Size
+        </a>
+        <div class="dropdown-menu my-2 text-center" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item no-focus" href="#"><input type="text" id="width-input" name="width-input" placeholder="Width"></a>
+          <a class="dropdown-item no-focus" href="#"><input type="text" id="height-input" name="height-input" placeholder="Height"></a>
+          <button class="btn button dropdown-item my-1" type="button" onclick="changeSize()">Apply</button>
+        </div>
+      </li>
+
+    </ul>
+  </div>
+</nav>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="drag_drop.js"></script>
 </body>
 </html>

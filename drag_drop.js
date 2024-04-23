@@ -1,8 +1,8 @@
 ////========================VARIABLE DECLERATIONS========================
-let canvas_width;
-let canvas_height;
 let padding_x;
 let padding_y;
+let canvas_height;
+let canvas_width
 
 let offset = {x: 0, y: 0};
 let lining;
@@ -11,7 +11,8 @@ let rack = [];
 let nodes = [];
 let bg;
 let rackX = 100;
-let rackY = 100;
+let rackY = 125;
+let nearest = null;
 
 
 let current_shape_index = null;
@@ -19,24 +20,14 @@ let is_dragging = false;
 
 
 function setup() {
-    createCanvas(windowWidth, windowHeight);
+    canvas_width = windowWidth - 6;
+    canvas_height = windowHeight - 6;
+
+    createCanvas(canvas_width, canvas_height);
     background(500);
 
     bg = createBG();
     image(bg, 0, 0);
-
-    addNode(new AND());
-    addNode(new AND());
-    addNode(new AND());
-    addNode(new AND());
-    addNode(new OR());
-    addNode(new BULB());
-    addNode(new BULB());
-    addNode(new SWITCH());
-    addNode(new SWITCH());
-    addNode(new XOR());
-    addNode(new SPLITTER());
-    addNode(new SPLITTER());
 
     for (let node of nodes) {
         node.show();
@@ -51,6 +42,7 @@ function draw() {
 }
 
 function set_nearest() {
+    if (!nodes) return;
     let minDistance = 10000000;
     for (let node of nodes) {
         let distance = dist(mouseX, mouseY, node.x, node.y);
@@ -136,7 +128,6 @@ function mousePressed() {
 
 function mouseReleased() {
     set_nearest();
-    console.log(nearest, nearest.inputNodes)
     moving = null;
 
     //If line is coming from an output connection box
@@ -243,23 +234,62 @@ function addNode(node){
 
 
 function createBG(){
-    let bg = createGraphics(3000, 3000);
+    let bg = createGraphics(7500, 7500);
     bg.background('#fff')
     bg.stroke('#888')
     size = 50;
-    for (let j = 0; j < 3000; j += size) bg.line(0, j, 3000, j);
-    for (let i = 0; i < 3000; i += size) bg.line(i, 0, i, 3000);
+    for (let j = 0; j < 7500; j += size) bg.line(0, j, 7500, j);
+    for (let i = 0; i < 7500; i += size) bg.line(i, 0, i, 7500);
 
   
     return bg;
 }
 
 function windowResized(){
-    
-    resizeCanvas(windowWidth, windowHeight);
+    if (windowHeight > canvas_height){
+        canvas_height = windowHeight - 6;
+    }
+
+    if (windowWidth > canvas_width){
+        canvas_width = windowWidth - 6;
+    }
+
+    resizeCanvas(canvas_width, canvas_height);
     image(bg, 0, 0);
 
 }
+
+function changeSize(){
+    heightInput = document.getElementById('height-input');
+    widthInput = document.getElementById('width-input');
+
+    let height = parseInt(heightInput.value);
+    let width = parseInt(widthInput.value);
+
+    heightInput.value = '';
+    widthInput.value = '';
+
+
+
+    if (isNaN(height) || isNaN(width)){
+        alert('Please enter a number');
+        return;
+    } else {
+
+        if (height > 7500 || width > 7500){
+            alert('Please enter a number less than 7500');
+            return;
+        } else {
+            resizeCanvas(width, height);
+            image(bg, 0, 0);
+
+
+        }
+    
+    }
+
+}
+
 
 
 
